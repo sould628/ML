@@ -19,13 +19,13 @@ class h2DLdata(hdata):
     def describe(self):
         print ("p1: "+str(self.p1)+", p2: "+str(self.p2)+", label: "+str(self.label))
 
-def dot(x,y):
-    return x[0]*y[0]+x[1]*y[1]
-
 def linKernel2(x, y):
     return x[0]*y[0]+x[1]*y[1]
 
-def constructOptProblem(data, C):
+def gausKernel2(x,y,sigma):
+    return np.exp(-((x[0]-y[0])**2+(x[1]-y[1])**2)/(2.*sigma**2))
+
+def constructOptProblem(data, C, sigma):
     #Optimization Problem Construction
     numData=len(data)
     pi=[]
@@ -33,7 +33,7 @@ def constructOptProblem(data, C):
     for i in range(len(data)):
         coli = []
         for j in range(len(data)):
-            coli.append(linKernel2(data[i].p, data[j].p)*data[i].label*data[j].label)
+            coli.append(gausKernel2(data[i].p, data[j].p, sigma)*data[i].label*data[j].label)
         pi.append(coli)
     temp=[]
     for i in range(len(data)):
@@ -44,7 +44,6 @@ def constructOptProblem(data, C):
     bmat=matrix(0.0)
     Gmat=matrix([-identity,identity])
     hmat=matrix([[0.0]*numData + [C]*numData])
-
     return {"P":Pmat, "q":qmat, "G":Gmat, "h":hmat, "A":Amat, "b":bmat}
 def getWeightLin(data, alpha):
     numData=len(data);
@@ -60,29 +59,26 @@ def findSoftVector(x):
         if x[i]>0.00001 or x[i]<-0.00001:
             result.append(i)
     return result
-def getBias(softvectoridx, data, alpha, slack):
+def getBias(softvectoridx, data, alpha, slack, sigma):
     result=0.0
     i=softvectoridx[0]
     result=data[i].label*(1-slack)
     sum=0.0
     for j in range(len(data)):
-        sum+=alpha[j]*data[j].label*linKernel2(data[j].p, data[i].p)
+        sum+=alpha[j]*data[j].label*gausKernel2(data[j].p, data[i].p, sigma)
     result-=sum
     return result
-def getClassificationValue(alpha, bias, training_data, test_data):
-    score=0.0
-    for i in range(len(training_data)):
-        score+=alpha[i]*training_data[i].label*dot(training_data[i].p, test_data)
-    score+=bias
-    return score
+
+
 
 def main():
     #variables
     C=1.0
+    sigma=15.0
 
     hwData=[]
     #ReadFile
-    file_location="./../file/data-ex1.txt"
+    file_location="./../file/data-ex2.txt"
     f=open(file_location, "r")
     lines=f.readlines()
     for line in lines:
@@ -95,12 +91,14 @@ def main():
     #ReadFile and Saved data in hwData
 
     #optimization problem
-    optMatrix=constructOptProblem(hwData, C)
+    optMatrix=constructOptProblem(hwData, C, sigma)
     sol=solvers.qp(optMatrix["P"],optMatrix["q"],optMatrix["G"],optMatrix["h"],optMatrix["A"],optMatrix["b"])
     print (sol)
     w=getWeightLin(hwData, sol['x'])
     softvectoridx=findSoftVector(sol['x'])
-    bias=getBias(softvectoridx, hwData, sol['x'], sol['primal slack'])
+    print(softvectoridx)
+    bias=getBias(softvectoridx, hwData, sol['x'], sol['primal slack'], sigma)
+
 
     print( "weight: "+str(w))
     print ("bias: "+str(bias))
@@ -122,7 +120,7 @@ def main():
     plt.title("LinearSVM Data")
     plt.xlabel('p1');plt.ylabel('p2')
     plt.grid()
-    plt.axis([0, 5, 0, 5])
+    plt.axis([0, 1.1, 0, 1.1])
     plt.legend(bbox_to_anchor=(0., 1.00), loc=2, ncol=1, mode=None, borderaxespad=0.)
     plt.show()
 
