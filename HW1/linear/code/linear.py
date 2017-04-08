@@ -20,21 +20,23 @@ class h2DLdata(hdata):
         print ("p1: "+str(self.p1)+", p2: "+str(self.p2)+", label: "+str(self.label))
 
 def dot(x,y):
-    return x[0]*y[0]+x[1]*y[1]
+    result=0.0
+    for i in range(len(x)):
+        result+=x[i]*y[i]
+    return result
 
 def linKernel2(x, y):
-    return x[0]*y[0]+x[1]*y[1]
+    return dot(x,y)
 
 def constructOptProblem(data, C):
     #Optimization Problem Construction
     numData=len(data)
     pi=[]
     identity=spmatrix(1.0, range(numData), range(numData))
-    for i in range(len(data)):
-        coli = []
-        for j in range(len(data)):
-            coli.append(linKernel2(data[i].p, data[j].p)*data[i].label*data[j].label)
-        pi.append(coli)
+    pi=np.zeros((numData, numData))
+    for i in range(numData):
+        for j in range(numData):
+            pi[i, j]=linKernel2(data[i].p, data[j].p)*data[i].label*data[j].label
     temp=[]
     for i in range(len(data)):
         temp.append([float(data[i].label)])
@@ -59,6 +61,7 @@ def findSoftVector(x):
     for i in range(len(x)):
         if x[i]>0.00001 or x[i]<-0.00001:
             result.append(i)
+    print ("Number of softvectors found: "+str(len(result)))
     return result
 def getBias(softvectoridx, data, alpha, slack):
     result=0.0
@@ -74,6 +77,7 @@ def getClassificationValue(alpha, bias, training_data, test_data):
     for i in range(len(training_data)):
         score+=alpha[i]*training_data[i].label*dot(training_data[i].p, test_data)
     score+=bias
+    print ("Classification of test data [" +str(test_data[0])+", "+str(test_data[1])+"] is "+str(score))
     return score
 
 def main():
@@ -104,6 +108,8 @@ def main():
 
     print( "weight: "+str(w))
     print ("bias: "+str(bias))
+
+    getClassificationValue(sol['x'], bias, hwData, [3., 2.7])
 
     #plot variables
     x1lst=[]; y1lst=[];x2lst=[];y2lst=[];
