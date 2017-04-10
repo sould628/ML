@@ -80,6 +80,22 @@ def getClassificationValue(alpha, bias, training_data, test_data):
     print ("Classification of test data [" +str(test_data[0])+", "+str(test_data[1])+"] is "+str(score))
     return score
 
+def printValues(alpha, bias, training_data, test_data, softvectoridx):
+    testscore=getClassificationValue(alpha, bias, training_data, test_data)
+    f=open("result.txt", "w")
+    for i in softvectoridx:
+        output_data="alpha of softvector ("+str(training_data[i].p1)+", "+str(training_data[i].p2)+") = "+str(alpha[i])+'\n'
+        f.write(output_data)
+    f.write('\n')
+    output_data="bias is: "+str(bias)
+    f.write(output_data)
+    f.write('\n\n')
+    output_data="score of point ("+str(test_data[0])+", "+str(test_data[1])+")="+str(getClassificationValue(alpha, bias, training_data, test_data))
+    f.write(output_data)
+    f.close()
+    return
+
+
 def main():
     #variables
     C=1.0
@@ -110,7 +126,7 @@ def main():
     print ("bias: "+str(bias))
 
     getClassificationValue(sol['x'], bias, hwData, [3., 2.7])
-
+    printValues(sol['x'], bias, hwData, [3,3], softvectoridx)
     #plot variables
     x1lst=[]; y1lst=[];x2lst=[];y2lst=[];
     xline=np.linspace(0, 5, 100)
@@ -124,7 +140,6 @@ def main():
     plt.plot(x1lst, y1lst, 'ro', label="label=1")
     plt.plot(x2lst, y2lst, 'bo', label="label=-1")
     plt.plot(xline, -(xline*w[0]+bias)/w[1], 'k')
-    plt.plot()
     plt.title("LinearSVM Data")
     plt.xlabel('p1');plt.ylabel('p2')
     plt.grid()
