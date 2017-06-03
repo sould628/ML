@@ -1,5 +1,11 @@
 import tensorflow as tf
 
+#GLOBAL VARIABLES
+IMAGE_SIZE=32
+NUM_CLASSES=10
+NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN=50000
+NUM_EXAMPLES_PER_EPOCH_FOR_EVAL=10000
+IMAGE_PIXELS=IMAGE_SIZE*IMAGE_SIZE*3
 
 def unpickle(file):
     import pickle
@@ -65,5 +71,12 @@ def read_CIFAR10(filename_queue, labelfile):
         result.batchfile[idx]=unpickle(file)
     labelList=unpickle(labelfile)
     showRandomData(result, labelList)
-
+    result.images=[]
+    result.labels=[]
+    import itertools
+    for idx in range(0, 5):
+        result.images=result.images+result.batchfile[idx][b'data'].tolist()
+        result.labels=result.labels+result.batchfile[idx][b'labels']
+    print(result.images[0])
+    print(result.labels[0])
     return result
