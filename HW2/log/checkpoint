@@ -1,0 +1,6 @@
+model_checkpoint_path: "Gmodel.ckpt-99"
+all_model_checkpoint_paths: "Gmodel.ckpt-59"
+all_model_checkpoint_paths: "Gmodel.ckpt-69"
+all_model_checkpoint_paths: "Gmodel.ckpt-79"
+all_model_checkpoint_paths: "Gmodel.ckpt-89"
+all_model_checkpoint_paths: "Gmodel.ckpt-99"

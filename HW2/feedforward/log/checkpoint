@@ -1,0 +1,6 @@
+model_checkpoint_path: "MFFmodel.ckpt-99"
+all_model_checkpoint_paths: "MFFmodel.ckpt-59"
+all_model_checkpoint_paths: "MFFmodel.ckpt-69"
+all_model_checkpoint_paths: "MFFmodel.ckpt-79"
+all_model_checkpoint_paths: "MFFmodel.ckpt-89"
+all_model_checkpoint_paths: "MFFmodel.ckpt-99"

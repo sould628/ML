@@ -1,0 +1,6 @@
+model_checkpoint_path: "MConvmodel.ckpt-49"
+all_model_checkpoint_paths: "MConvmodel.ckpt-9"
+all_model_checkpoint_paths: "MConvmodel.ckpt-19"
+all_model_checkpoint_paths: "MConvmodel.ckpt-29"
+all_model_checkpoint_paths: "MConvmodel.ckpt-39"
+all_model_checkpoint_paths: "MConvmodel.ckpt-49"

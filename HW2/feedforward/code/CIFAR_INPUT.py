@@ -1,4 +1,4 @@
-import tensorflow as tf
+import numpy as np
 
 #GLOBAL VARIABLES
 IMAGE_SIZE=32
@@ -12,6 +12,12 @@ def unpickle(file):
     with open(file, 'rb') as fo:
         dict=pickle.load(fo, encoding='bytes')
         return dict
+
+def load_batch(file):
+    raw_data=unpickle(file)
+    images=np.reshape(raw_data[b'data'], (-1,32,32,3))
+    labels=np.asarray(raw_data[b'labels'])
+    return images, labels
 
 def CIFAR2PNG(img, width, height, depth):
     import numpy as np
@@ -59,7 +65,7 @@ def showRandomData(record, labelList):
 
 
 
-def read_CIFAR10(filename_queue, labelfile):
+def read_CIFAR10(filename_queue, testfile, labelfile):
 
     class CIFAR10Record(object):
         batchfile=[None]*5
@@ -67,16 +73,28 @@ def read_CIFAR10(filename_queue, labelfile):
     result.height=32
     result.width=32
     result.depth=3
-    for idx, file in enumerate(filename_queue):
-        result.batchfile[idx]=unpickle(file)
-    labelList=unpickle(labelfile)
-    showRandomData(result, labelList)
     result.images=[]
     result.labels=[]
+    img_list=[]
+    lab_list=[]
+    for idx, file in enumerate(filename_queue):
+        result.batchfile[idx]=unpickle(file)
+        img, lab=load_batch(file)
+        img_list.append(img)
+        lab_list.append(lab)
+    result.data_images=np.vstack(img_list)
+    result.data_images=result.data_images.transpose([0,2,1,3])
+    result.data_labels=np.hstack(lab_list)
+    test_img, test_lab=load_batch(testfile)
+    result.test_images=np.vstack(test_img)
+    result.test_images=result.test_images.transpose([1,0,2])
+    result.test_labels=np.hstack(test_lab)
+
+    labelList=unpickle(labelfile)
+    showRandomData(result, labelList)
     import itertools
     for idx in range(0, 5):
         result.images=result.images+result.batchfile[idx][b'data'].tolist()
         result.labels=result.labels+result.batchfile[idx][b'labels']
-    print(result.images[0])
-    print(result.labels[0])
+
     return result
